@@ -47,6 +47,12 @@ export async function analyzeAudio(formData: FormData) {
             console.log('Transcription complete:', text.substring(0, 50) + '...');
         }
 
+        // Check if transcription is empty or too short (silent/no speech detected)
+        const cleanedText = text.replace(/[^a-zA-Z0-9\u0B80-\u0BFF\u0900-\u0DFF\u4E00-\u9FFF\uAC00-\uD7AF]/g, '').trim();
+        if (!cleanedText || cleanedText.length < 2) {
+            throw new Error('No speech detected in the audio. Please upload an audio file with clear speech or provide a transcript.');
+        }
+
         const actualModel = config.model.startsWith('custom:')
             ? config.model.replace('custom:', '')
             : config.model;
@@ -59,6 +65,8 @@ export async function analyzeAudio(formData: FormData) {
             2. Fluency (Flow, pace, filler words)
             3. Pronunciation (If possible from text context, or overall articulation)
             4. Emotional tone (Good, Sad, Active, Bold, etc.)
+
+            IMPORTANT: If the text appears to be meaningless, gibberish, auto-generated noise, or does not contain real speech content, return all scores as "0/10" and set feedback to indicate no meaningful speech was detected.
 
             Return the result strictly as a JSON object matching this structure:
             {

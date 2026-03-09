@@ -18,9 +18,16 @@ export function AudioUploader({ onAnalyze, isLoading }: AudioUploaderProps) {
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const chunksRef = useRef<Blob[]>([]);
 
+    const MAX_FILE_SIZE_MB = 25;
+
     const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const uploadedFile = e.target.files?.[0];
         if (uploadedFile) {
+            if (uploadedFile.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+                alert(`File size exceeds ${MAX_FILE_SIZE_MB}MB limit. Please upload a smaller file.`);
+                e.target.value = '';
+                return;
+            }
             setFile(uploadedFile);
             setAudioUrl(URL.createObjectURL(uploadedFile));
         }
