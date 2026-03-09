@@ -47,7 +47,11 @@ export async function analyzeAudio(formData: FormData) {
             console.log('Transcription complete:', text.substring(0, 50) + '...');
         }
 
-        console.log('Starting AI analysis with model:', config.model || 'gpt-4o');
+        const actualModel = config.model.startsWith('custom:')
+            ? config.model.replace('custom:', '')
+            : config.model;
+
+        console.log('Starting AI analysis with model:', actualModel || 'gpt-4o');
 
         const prompt = `
             Analyze the following speech text for:
@@ -69,7 +73,7 @@ export async function analyzeAudio(formData: FormData) {
         `;
 
         const response = await openai.chat.completions.create({
-            model: config.model || 'gpt-4o',
+            model: actualModel || 'gpt-4o',
             messages: [{ role: 'user', content: prompt }],
             temperature: config.temperature || 0.7,
             response_format: { type: 'json_object' },

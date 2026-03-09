@@ -49,15 +49,43 @@ export function ConfigModal({ config, onSave, onClose }: ConfigModalProps) {
                             <span>Model Selection</span>
                         </div>
                         <select
-                            value={localConfig.model}
-                            onChange={(e) => setLocalConfig({ ...localConfig, model: e.target.value })}
+                            value={localConfig.model.startsWith('custom:') ? 'custom' : localConfig.model}
+                            onChange={(e) => {
+                                const val = e.target.value;
+                                if (val === 'custom') {
+                                    setLocalConfig({ ...localConfig, model: 'custom:' });
+                                } else {
+                                    setLocalConfig({ ...localConfig, model: val });
+                                }
+                            }}
                             className="w-full glass p-4 rounded-2xl focus:ring-2 focus:ring-accent/50 border-white/10 focus:border-accent outline-none text-gray-200"
                         >
-                            <option value="gpt-4o" className="bg-gray-900">GPT-4o (Smartest)</option>
-                            <option value="gpt-4o-mini" className="bg-gray-900">GPT-4o-Mini (Faster)</option>
-                            <option value="gpt-3.5-turbo" className="bg-gray-900">GPT-3.5-Turbo (Cheaper)</option>
+                            <option value="gpt-4o" className="bg-gray-900">GPT-4o (Omni - Recommended)</option>
+                            <option value="gpt-4o-mini" className="bg-gray-900">GPT-4o-Mini (Fast & Cheap)</option>
+                            <option value="o1-preview" className="bg-gray-900">o1-Preview (Advanced Reasoning)</option>
+                            <option value="o1-mini" className="bg-gray-900">o1-Mini (Fast Reasoning)</option>
+                            <option value="gpt-4-turbo" className="bg-gray-900">GPT-4 Turbo</option>
+                            <option value="gpt-4" className="bg-gray-900">GPT-4 (Classic)</option>
+                            <option value="gpt-3.5-turbo" className="bg-gray-900">GPT-3.5 Turbo (Legacy)</option>
+                            <option value="custom" className="bg-gray-900">Custom Model Name...</option>
                         </select>
                     </div>
+
+                    {localConfig.model.startsWith('custom:') && (
+                        <div className="space-y-2 animate-in slide-in-from-top-2 duration-200">
+                            <div className="flex items-center space-x-2 text-sm font-medium text-purple-400 px-1">
+                                <Cpu className="w-4 h-4" />
+                                <span>Enter Custom Model ID</span>
+                            </div>
+                            <input
+                                type="text"
+                                placeholder="e.g. ft:gpt-3.5-turbo:..."
+                                value={localConfig.model.replace('custom:', '')}
+                                onChange={(e) => setLocalConfig({ ...localConfig, model: 'custom:' + e.target.value })}
+                                className="w-full glass p-4 rounded-2xl focus:ring-2 focus:ring-purple-500/50 border-white/10 focus:border-purple-400 outline-none text-gray-200 placeholder-gray-600"
+                            />
+                        </div>
+                    )}
 
                     <div className="space-y-2">
                         <div className="flex justify-between items-center px-1">
